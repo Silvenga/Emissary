@@ -44,7 +44,7 @@ namespace Emissary.Discovery
         private async Task Poll(ContainerRegistrar registrar, CancellationToken token)
         {
             var containers = await _client.GetContainerServices(token);
-            registrar.DisoveryContainers(containers);
+            registrar.DisoverContainers(containers);
         }
     }
 

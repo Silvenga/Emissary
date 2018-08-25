@@ -2,21 +2,34 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using Emissary.Discovery;
+using NLog;
 
 namespace Emissary.Core
 {
     public class ContainerRegistrar
     {
-        private readonly ConcurrentDictionary<string, ContainerService> _containers = new ConcurrentDictionary<string, ContainerService>();
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        public void DisoveryContainers(IReadOnlyCollection<ContainerService> containers)
+        private readonly ConcurrentDictionary<string, ContainerService> _containerServices = new ConcurrentDictionary<string, ContainerService>();
+
+        public void DisoverContainers(IReadOnlyCollection<ContainerService> services)
         {
-
-
-            foreach (var container in containers)
+            foreach (var service in services)
             {
-                //_containers.TryAdd(container.Id,);
+                var added = _containerServices.TryAdd(service.ContainerId, service);
+                if (added)
+                {
+                    Logger.Info($"Discovered new service [{service.ServiceName}] for container [{service.ContainerId}].");
+                }
+            }
+
+            foreach (var missingContainerId in _containerServices.Keys.Except(services.Select(x => x.ContainerId)))
+            {
+                var removed = _containerServices.TryRemove(missingContainerId, out var service);
+                if (removed)
+                {
+                    Logger.Info($"Discovered removed service [{service.ServiceName}] for container [{service.ContainerId}].");
+                }
             }
         }
     }
