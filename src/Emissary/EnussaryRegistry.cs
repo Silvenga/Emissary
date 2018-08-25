@@ -48,6 +48,7 @@ namespace Emissary
 
             For<IAgent>().Add<ContainerDiscoveryAgent>();
             For<IAgent>().Add<ServiceRegistrationAgent>();
+            For<IAgent>().Add<CleanupAgent>();
         }
     }
 }
