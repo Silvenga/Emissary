@@ -1,7 +1,9 @@
-﻿using System.Threading;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
-using Emissary.Discovery;
+using Emissary.Agents;
 
 using NLog;
 
@@ -12,30 +14,43 @@ namespace Emissary.Core
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         private readonly ContainerRegistrar _registrar;
-        private readonly PollingAgent _pollingAgent;
+        private readonly ICollection<IAgent> _agents;
+        private readonly JobScheduler _scheduler;
         private readonly CancellationTokenSource _tokenSource = new CancellationTokenSource();
 
-        public Mission(ContainerRegistrar registrar, PollingAgent pollingAgent)
+        public Mission(ContainerRegistrar registrar, List<IAgent> agents, JobScheduler scheduler)
         {
             _registrar = registrar;
-            _pollingAgent = pollingAgent;
+            _agents = agents;
+            _scheduler = scheduler;
         }
 
-        public async Task Start(string[] args)
+        public Task Start(string[] args)
         {
             Logger.Info("The emissary mission has begun.");
 
-            Logger.Info("Starting discovery agents.");
-            _pollingAgent.Monitor(_registrar, _tokenSource.Token);
+            Logger.Info($"Starting agents [{string.Join(", ", _agents.Select(x => x.GetType().Name))}].");
+            foreach (var agent in _agents)
+            {
+                agent.Monitor(_registrar, _tokenSource.Token);
+            }
+            Logger.Info("Completed starting agents.");
 
             Logger.Info("The emissary mission has started.");
 
+            return Task.CompletedTask;
         }
 
         public async Task Stop()
         {
-            Logger.Info("The emissary mission has ended. Will send shutdown signal to pending tasks.");
+            Logger.Info("The emissary mission has ended. Beginning shutdown logic.");
+
+            Logger.Info("Notifing all the agents to stop.");
             _tokenSource.Cancel();
+
+            Logger.Info("Waiting for all outstanding jobs to complete.");
+            await _scheduler.WaitForAllTasks();
+
             Logger.Info("Shutdown complete.");
         }
     }

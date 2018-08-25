@@ -1,6 +1,6 @@
 ﻿using CommandLine;
 
-using Emissary.Discovery;
+using Emissary.Core;
 
 using FluentAssertions;
 

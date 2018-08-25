@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,6 +7,7 @@ using Docker.DotNet;
 using Docker.DotNet.Models;
 
 using Emissary.Core;
+using Emissary.Models;
 
 namespace Emissary.Discovery
 {
@@ -57,19 +57,11 @@ namespace Emissary.Discovery
                                ContainerId = container.Id,
                                ServicePort = service.ServicePort,
                                ServiceName = service.ServiceName,
-                               ServiceTags = service.ServiceTags
+                               ServiceTags = service.ServiceTags,
+                               ContainerStatus = container.Status,
+                               ContainerCreationOn = container.Created
                            };
             return services.ToList();
         }
-    }
-
-    public class DiscoveredContainer
-    {
-        public string Id { get; set; }
-        public IDictionary<string, string> Labels { get; set; }
-        public DateTime Created { get; set; }
-        public IList<string> Names { get; set; }
-        public string State { get; set; }
-        public string Status { get; set; }
     }
 }
