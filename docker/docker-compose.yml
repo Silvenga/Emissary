@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  emissary:
+    image: ${DOCKER_REGISTRY}emissary
+    build:
+      context: ../
+      dockerfile: src/Emissary/Dockerfile
