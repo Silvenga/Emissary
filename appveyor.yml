@@ -23,3 +23,6 @@ environment:
     secure: z0QkG5dMUovqmdiVrojAAA==
 build_script:
 - pwsh: ./build.ps1 -BuildVersion "$env:APPVEYOR_BUILD_VERSION" -Release "$env:APPVEYOR_REPO_TAG" -DockerUsername "$env:DOCKER_USERNAME" -DockerPassword "$env:DOCKER_PASSWORD"
+on_finish:
+  - sh: export APPVEYOR_SSH_BLOCK=true
+  - sh: curl -sflL 'https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-ssh.sh' | bash -e -

@@ -7,10 +7,11 @@ Automatically registers services running in Docker containers with Consul.
 ```sh
 docker run \
     --net=host \
-    -e VERSION=latest \
     -v /var/run/docker.sock:/var/run/docker.sock:ro \
     silvenga/emissary
 ```
+
+The network should be `host` to allow **Emissary** to access the local Consul agent. This is not required if the Consul agent is running as a container or on another host.
 
 ## Options
 
