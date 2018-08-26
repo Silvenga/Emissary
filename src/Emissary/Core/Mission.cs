@@ -36,8 +36,6 @@ namespace Emissary.Core
             }
             Logger.Info("Completed starting agents.");
 
-            Logger.Info("The emissary mission has started.");
-
             return Task.CompletedTask;
         }
 

@@ -12,7 +12,9 @@ namespace Emissary
     {
         private static async Task Main(string[] args)
         {
-            var container = new Container(registry => registry.IncludeRegistry<EnussaryRegistry>());
+            Logging.Configure();
+
+            var container = new Container(registry => registry.IncludeRegistry<EmissaryRegistry>());
 
             var mission = container.GetInstance<Mission>();
 
@@ -28,6 +30,12 @@ namespace Emissary
             {
                 eventArgs.Cancel = true;
                 exitEvent.Set();
+            };
+
+            AppDomain.CurrentDomain.ProcessExit += (sender, eventArgs) =>
+            {
+                exitEvent.Set();
+                Thread.Sleep(2000);
             };
 
             await Task.Run(() => exitEvent.WaitOne());

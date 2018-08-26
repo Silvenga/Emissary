@@ -13,9 +13,9 @@ using Microsoft.Extensions.Configuration;
 
 namespace Emissary
 {
-    public class EnussaryRegistry : ServiceRegistry
+    public class EmissaryRegistry : ServiceRegistry
     {
-        public EnussaryRegistry()
+        public EmissaryRegistry()
         {
             IConfiguration configuration = new ConfigurationBuilder()
                                            .SetBasePath(Directory.GetCurrentDirectory())

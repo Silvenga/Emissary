@@ -13,7 +13,7 @@
     <PackageReference Include="Lamar" Version="1.1.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="2.1.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.1.1" />
-    <PackageReference Include="NLog.Config" Version="4.5.9" />
+    <PackageReference Include="NLog" Version="4.5.9" />
   </ItemGroup>
 
 </Project>
