@@ -16,5 +16,10 @@ dotnet_csproj:
   assembly_version: '{version}'
   file_version: '{version}'
   informational_version: '{version}'
+environment:
+  DOCKER_USERNAME:
+    secure: jj922IXnopwoX3M9WFaP8g==
+  DOCKER_PASSWORD:
+    secure: z0QkG5dMUovqmdiVrojAAA==
 build_script:
-- pwsh: docker build -t silvenga/emissary -f src/Emissary/Dockerfile .
+- pwsh: ./build.ps1 -BuildVersion "$env:APPVEYOR_BUILD_VERSION" -Release "$env:APPVEYOR_REPO_TAG" -DockerUsername "$env:DOCKER_USERNAME" -DockerPassword "$env:DOCKER_PASSWORD"
