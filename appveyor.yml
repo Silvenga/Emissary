@@ -2,10 +2,10 @@ version: 0.0.{build}-ci
 image: Ubuntu
 init:
 - pwsh: >-
-    $tagRelease = $env:appveyor_repo_tag -eq 'true'
+    $tagRelease = $env:APPVEYOR_REPO_TAG -eq 'true'
 
     if ($tagRelease) {
-        $tag = $env:appveyor_repo_tag_name
+        $tag = $env:APPVEYOR_REPO_TAG_NAME
         Update-AppveyorBuild -Version "$tag"
     }
 dotnet_csproj:
@@ -17,12 +17,9 @@ dotnet_csproj:
   file_version: '{version}'
   informational_version: '{version}'
 environment:
-  DOCKER_USERNAME:
-    secure: jj922IXnopwoX3M9WFaP8g==
-  DOCKER_PASSWORD:
-    secure: z0QkG5dMUovqmdiVrojAAA==
+  DOCKER_AUTH:
+    secure: PTQaihoDFzLdA6kSCeVqvXIrJVXj3Q5M2aneMx8m5Kef37IKGdFbKoe5SlBuRajB47p4sZhATD/jijtiWSq/FPeJBlTZkenAYUYvIfV332Z8+ID+Hw310GmjxRO/r2E/
 build_script:
-- pwsh: ./build.ps1 -BuildVersion "$env:APPVEYOR_BUILD_VERSION" -Release "$env:APPVEYOR_REPO_TAG" -DockerUsername "$env:DOCKER_USERNAME" -DockerPassword "$env:DOCKER_PASSWORD"
-on_finish:
-  - sh: export APPVEYOR_SSH_BLOCK=true
-  - sh: curl -sflL 'https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-ssh.sh' | bash -e -
+- pwsh: mkdir /home/appveyor/.docker/
+- pwsh: Out-File -FilePath /home/appveyor/.docker/config.json -InputObject "$env:DOCKER_AUTH" -Encoding ASCII
+- pwsh: ./build.ps1 -BuildVersion "$env:APPVEYOR_BUILD_VERSION" -Release "$env:APPVEYOR_REPO_TAG"

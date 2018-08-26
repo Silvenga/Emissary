@@ -1,8 +1,6 @@
 Param(
     [string] $BuildVersion,
-    [string] $Release,
-    [string] $DockerUsername,
-    [string] $DockerPassword
+    [string] $Release
 )
 
 $shouldRelease = $Release -eq "true"
@@ -14,7 +12,7 @@ docker tag silvenga/emissary:$BuildVersion silvenga/emissary:latest
 
 if ($shouldRelease)
 {
-    Write-Host "Logging into DockerHub."
-    "$DockerPassword" | docker login -u "$DockerUsername" --password-stdin
     Write-Host "Deploying image to DockerHub."
+    docker push silvenga/emissary:$BuildVersion
+    docker push silvenga/emissary:latest
 }
