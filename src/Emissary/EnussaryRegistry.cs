@@ -19,7 +19,8 @@ namespace Emissary
         {
             IConfiguration configuration = new ConfigurationBuilder()
                                            .SetBasePath(Directory.GetCurrentDirectory())
-                                           .AddJsonFile("appsettings.json")
+                                           .AddJsonFile("appsettings.json", true)
+                                           .AddEnvironmentVariables()
                                            .Build();
 
             For<IConfiguration>().Use(configuration);
