@@ -1,5 +1,9 @@
 
 # Emissary
+
+[![AppVeyor](https://img.shields.io/appveyor/ci/Silvenga/emissary.svg?logo=appveyor&maxAge=3600)](https://ci.appveyor.com/project/Silvenga/emissary)
+[![DockerHub](https://img.shields.io/badge/image-dockerhub-blue.svg?maxAge=3600&logo=docker)](https://hub.docker.com/r/silvenga/emissary/)
+
 Automatically registers services running in Docker containers with Consul.
 
 ## Usage
