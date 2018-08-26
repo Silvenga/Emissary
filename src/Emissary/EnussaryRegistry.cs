@@ -28,7 +28,7 @@ namespace Emissary
             For<DockerClientConfiguration>().Use(x =>
             {
                 var config = x.GetInstance<IConfiguration>();
-                return new DockerClientConfiguration(new Uri(config["Docker:Host"]));
+                return new DockerClientConfiguration(new Uri(config["Docker:Host"] ?? "unix:///var/run/docker.sock"));
             });
             For<DockerClient>().Use(x =>
             {
@@ -42,7 +42,7 @@ namespace Emissary
                 return new ConsulClient(clientConfiguration =>
                 {
                     clientConfiguration.Token = config["Consul:Token"];
-                    clientConfiguration.Address = new Uri(config["Consul:Host"]);
+                    clientConfiguration.Address = new Uri(config["Consul:Host"] ?? "http://localhost:8500");
                     clientConfiguration.Datacenter = config["Consul:Datacenter"];
                 });
             });
