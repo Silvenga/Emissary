@@ -66,9 +66,9 @@ namespace Emissary.Clients
             await _client.Agent.ServiceDeregister(serviceName + "_" + containerId, cancellationToken);
         }
 
-        public async Task MaintainService(string checkId, CancellationToken cancellationToken)
+        public async Task MaintainService(string checkId, string status, CancellationToken cancellationToken)
         {
-            await _client.Agent.UpdateTTL(checkId, null, TTLStatus.Pass, cancellationToken);
+            await _client.Agent.UpdateTTL(checkId, status, TTLStatus.Pass, cancellationToken);
         }
 
         public void Dispose()

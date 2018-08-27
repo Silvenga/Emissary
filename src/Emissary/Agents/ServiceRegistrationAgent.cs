@@ -53,18 +53,22 @@ namespace Emissary.Agents
 
         private async Task MaintenanceLoop(ContainerRegistrar registrar, CancellationToken token)
         {
-            var existingChecks = await _client.GetRegisteredServicesAndChecks(token);
+            var consulChecks = await _client.GetRegisteredServicesAndChecks(token);
             IReadOnlyList<ContainerService> desiredContainerServices = null;
 
             registrar.Operate(transation => { desiredContainerServices = transation.GetAllContainerServices(); });
 
             var checks = from desiredService in desiredContainerServices
-                         from existingService in existingChecks.Where(x => x.ContainerId == desiredService.ContainerId)
-                         select existingService;
+                         from consulService in consulChecks.Where(x => x.ContainerId == desiredService.ContainerId)
+                         select new
+                         {
+                             desiredService.ContainerStatus,
+                             consulService.CheckId
+                         };
 
             foreach (var check in checks)
             {
-                await _client.MaintainService(check.CheckId, token);
+                await _client.MaintainService(check.CheckId, check.ContainerStatus, token);
             }
         }
     }
