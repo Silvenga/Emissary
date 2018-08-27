@@ -20,6 +20,7 @@ namespace Emissary.Core
         public event EventHandler<ContainerCreatedEventArgs> ContainerCreated;
         public event EventHandler<ContainerDeletedEventArgs> ContainerDeleted;
         public event EventHandler<ContainerServiceCreatedEventArgs> ContainerServiceCreated;
+        public event EventHandler<ContainerServiceUpdatedEventArgs> ContainerServiceUpdated;
 
         public void Operate(Action<ContainerRegistrarTransaction> action)
         {
@@ -42,6 +43,11 @@ namespace Emissary.Core
         private void OnContainerServiceCreated(ContainerServiceCreatedEventArgs e)
         {
             ContainerServiceCreated?.Invoke(this, e);
+        }
+
+        private void OnContainerServiceUpdated(ContainerServiceUpdatedEventArgs e)
+        {
+            ContainerServiceUpdated?.Invoke(this, e);
         }
 
         public class ContainerRegistrarTransaction
@@ -74,6 +80,19 @@ namespace Emissary.Core
                 }
 
                 _registrar.OnContainerServiceCreated(new ContainerServiceCreatedEventArgs(service.ContainerId, service));
+            }
+
+            public void UpdateContainerService(ContainerService service)
+            {
+                var containerExists = _containerServices.ContainsKey(service.ContainerId) && _containerServices[service.ContainerId].ContainsKey(service.ServiceName);
+                if (!containerExists)
+                {
+                    throw new Exception($"The service {service.ServiceName} in container {service.ContainerId} does not exist or the container is missing.");
+                }
+
+                _containerServices[service.ContainerId][service.ServiceName] = service;
+
+                _registrar.OnContainerServiceUpdated(new ContainerServiceUpdatedEventArgs(service.ContainerId, service));
             }
 
             public void DeleteContainer(string containerId)

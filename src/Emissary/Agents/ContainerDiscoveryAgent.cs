@@ -38,12 +38,20 @@ namespace Emissary.Agents
                 var newContainers = from containerId in desiredContainers.Select(x => x.ContainerId).Except(currentContainers).Distinct()
                                     from containerService in desiredContainers.Where(x => x.ContainerId == containerId)
                                     select containerService;
+                var updatedContainers = from c in desiredContainers
+                                        from v in currentContainers.Where(x => c.ContainerId == x)
+                                        select c;
                 var extraContainers = currentContainers.Except(desiredContainers.Select(x => x.ContainerId)).Distinct();
 
                 foreach (var service in newContainers)
                 {
                     Logger.Info($"Discovered service [{service.ServiceName}] under container [{service.ContainerId}].");
                     transation.AddContainerService(service);
+                }
+
+                foreach (var service in updatedContainers)
+                {
+                    transation.UpdateContainerService(service);
                 }
 
                 foreach (var containerId in extraContainers)
