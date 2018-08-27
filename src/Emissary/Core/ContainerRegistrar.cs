@@ -5,8 +5,11 @@ using System.Linq;
 using Emissary.Core.Events;
 using Emissary.Models;
 
+using JetBrains.Annotations;
+
 namespace Emissary.Core
 {
+    [UsedImplicitly]
     public class ContainerRegistrar
     {
         private readonly object _rock = new object();
@@ -26,17 +29,17 @@ namespace Emissary.Core
             }
         }
 
-        protected virtual void OnContainerCreated(ContainerCreatedEventArgs e)
+        private void OnContainerCreated(ContainerCreatedEventArgs e)
         {
             ContainerCreated?.Invoke(this, e);
         }
 
-        protected virtual void OnContainerDeleted(ContainerDeletedEventArgs e)
+        private void OnContainerDeleted(ContainerDeletedEventArgs e)
         {
             ContainerDeleted?.Invoke(this, e);
         }
 
-        protected virtual void OnContainerServiceCreated(ContainerServiceCreatedEventArgs e)
+        private void OnContainerServiceCreated(ContainerServiceCreatedEventArgs e)
         {
             ContainerServiceCreated?.Invoke(this, e);
         }

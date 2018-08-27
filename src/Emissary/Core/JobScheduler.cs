@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
+using JetBrains.Annotations;
+
 using NLog;
 
 namespace Emissary.Core
 {
+    [UsedImplicitly]
     public class JobScheduler
     {
         private readonly ISet<Task> _knownTasks = new HashSet<Task>();

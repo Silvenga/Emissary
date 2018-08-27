@@ -5,10 +5,13 @@ using System.Threading.Tasks;
 
 using Emissary.Agents;
 
+using JetBrains.Annotations;
+
 using NLog;
 
 namespace Emissary.Core
 {
+    [UsedImplicitly]
     public class Mission
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
