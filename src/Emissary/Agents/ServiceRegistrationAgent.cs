@@ -4,9 +4,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
+using Emissary.Clients;
 using Emissary.Core;
 using Emissary.Core.Events;
-using Emissary.Management;
 using Emissary.Models;
 
 using NLog;

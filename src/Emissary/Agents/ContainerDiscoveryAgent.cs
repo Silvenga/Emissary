@@ -2,8 +2,8 @@
 using System.Threading;
 using System.Threading.Tasks;
 
+using Emissary.Clients;
 using Emissary.Core;
-using Emissary.Discovery;
 
 using NLog;
 

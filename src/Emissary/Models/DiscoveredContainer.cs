@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Emissary.Discovery
+namespace Emissary.Models
 {
     public class DiscoveredContainer
     {

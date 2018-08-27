@@ -9,7 +9,7 @@ using Docker.DotNet.Models;
 using Emissary.Core;
 using Emissary.Models;
 
-namespace Emissary.Discovery
+namespace Emissary.Clients
 {
     public class ContainerDiscoveryClient
     {

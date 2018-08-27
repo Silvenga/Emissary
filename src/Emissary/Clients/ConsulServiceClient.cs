@@ -8,7 +8,7 @@ using Consul;
 
 using Emissary.Models;
 
-namespace Emissary.Management
+namespace Emissary.Clients
 {
     public class ConsulServiceClient : IDisposable
     {
