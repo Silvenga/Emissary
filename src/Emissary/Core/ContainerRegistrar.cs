@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 using Emissary.Core.Events;
 using Emissary.Models;
@@ -9,10 +11,30 @@ using JetBrains.Annotations;
 
 namespace Emissary.Core
 {
-    [UsedImplicitly]
-    public class ContainerRegistrar
+    public interface IContainerRegistrar
     {
-        private readonly object _rock = new object();
+        event EventHandler<ContainerCreatedEventArgs> ContainerCreated;
+        event EventHandler<ContainerDeletedEventArgs> ContainerDeleted;
+        event EventHandler<ContainerServiceCreatedEventArgs> ContainerServiceCreated;
+        event EventHandler<ContainerServiceUpdatedEventArgs> ContainerServiceUpdated;
+        Task<IContainerRegistrarTransaction> BeginTransaction();
+    }
+
+    public interface IContainerRegistrarTransaction : IDisposable
+    {
+        void AddContainerService(ContainerService service);
+        void UpdateContainerService(ContainerService service);
+        void DeleteContainer(string containerId);
+        IReadOnlyList<string> GetContainers();
+        IReadOnlyList<ContainerService> GetAllContainerServices();
+        IReadOnlyList<ContainerService> GetContainerServices(string containerId);
+        ContainerService GetContainerService(string containerId, string serviceName);
+    }
+
+    [UsedImplicitly]
+    public class ContainerRegistrar : IContainerRegistrar
+    {
+        private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
 
         private readonly Dictionary<string, Dictionary<string, ContainerService>> _containerServices =
             new Dictionary<string, Dictionary<string, ContainerService>>();
@@ -22,43 +44,43 @@ namespace Emissary.Core
         public event EventHandler<ContainerServiceCreatedEventArgs> ContainerServiceCreated;
         public event EventHandler<ContainerServiceUpdatedEventArgs> ContainerServiceUpdated;
 
-        public void Operate(Action<ContainerRegistrarTransaction> action)
+        public async Task<IContainerRegistrarTransaction> BeginTransaction()
         {
-            lock (_rock)
-            {
-                action(new ContainerRegistrarTransaction(this));
-            }
+            await _semaphore.WaitAsync();
+            return new ContainerRegistrarTransaction(this, () => _semaphore.Release());
         }
 
-        private void OnContainerCreated(ContainerCreatedEventArgs e)
+        private void OnContainerCreated(ContainerRegistrarTransaction transaction, ContainerCreatedEventArgs e)
         {
-            ContainerCreated?.Invoke(this, e);
+            ContainerCreated?.Invoke(transaction, e);
         }
 
-        private void OnContainerDeleted(ContainerDeletedEventArgs e)
+        private void OnContainerDeleted(ContainerRegistrarTransaction transaction, ContainerDeletedEventArgs e)
         {
-            ContainerDeleted?.Invoke(this, e);
+            ContainerDeleted?.Invoke(transaction, e);
         }
 
-        private void OnContainerServiceCreated(ContainerServiceCreatedEventArgs e)
+        private void OnContainerServiceCreated(ContainerRegistrarTransaction transaction, ContainerServiceCreatedEventArgs e)
         {
-            ContainerServiceCreated?.Invoke(this, e);
+            ContainerServiceCreated?.Invoke(transaction, e);
         }
 
-        private void OnContainerServiceUpdated(ContainerServiceUpdatedEventArgs e)
+        private void OnContainerServiceUpdated(ContainerRegistrarTransaction transaction, ContainerServiceUpdatedEventArgs e)
         {
-            ContainerServiceUpdated?.Invoke(this, e);
+            ContainerServiceUpdated?.Invoke(transaction, e);
         }
 
-        public class ContainerRegistrarTransaction
+        public class ContainerRegistrarTransaction : IContainerRegistrarTransaction
         {
             private readonly ContainerRegistrar _registrar;
+            private readonly Action _disposeAction;
 
             private readonly Dictionary<string, Dictionary<string, ContainerService>> _containerServices;
 
-            public ContainerRegistrarTransaction(ContainerRegistrar registrar)
+            public ContainerRegistrarTransaction(ContainerRegistrar registrar, Action disposeAction)
             {
                 _registrar = registrar;
+                _disposeAction = disposeAction;
                 _containerServices = registrar._containerServices;
             }
 
@@ -68,7 +90,7 @@ namespace Emissary.Core
                 if (!containerExists)
                 {
                     _containerServices.Add(service.ContainerId, new Dictionary<string, ContainerService>());
-                    _registrar.OnContainerCreated(new ContainerCreatedEventArgs(service.ContainerId));
+                    _registrar.OnContainerCreated(this, new ContainerCreatedEventArgs(service.ContainerId));
                 }
 
                 var set = _containerServices[service.ContainerId];
@@ -79,12 +101,13 @@ namespace Emissary.Core
                     throw new Exception($"A service with the name {service.ServiceName} for container {service.ContainerId} already exists.");
                 }
 
-                _registrar.OnContainerServiceCreated(new ContainerServiceCreatedEventArgs(service.ContainerId, service));
+                _registrar.OnContainerServiceCreated(this, new ContainerServiceCreatedEventArgs(service.ContainerId, service));
             }
 
             public void UpdateContainerService(ContainerService service)
             {
-                var containerExists = _containerServices.ContainsKey(service.ContainerId) && _containerServices[service.ContainerId].ContainsKey(service.ServiceName);
+                var containerExists = _containerServices.ContainsKey(service.ContainerId)
+                                      && _containerServices[service.ContainerId].ContainsKey(service.ServiceName);
                 if (!containerExists)
                 {
                     throw new Exception($"The service {service.ServiceName} in container {service.ContainerId} does not exist or the container is missing.");
@@ -92,7 +115,7 @@ namespace Emissary.Core
 
                 _containerServices[service.ContainerId][service.ServiceName] = service;
 
-                _registrar.OnContainerServiceUpdated(new ContainerServiceUpdatedEventArgs(service.ContainerId, service));
+                _registrar.OnContainerServiceUpdated(this, new ContainerServiceUpdatedEventArgs(service.ContainerId, service));
             }
 
             public void DeleteContainer(string containerId)
@@ -103,7 +126,7 @@ namespace Emissary.Core
                     throw new Exception($"Container {containerId} does not exist.");
                 }
 
-                _registrar.OnContainerDeleted(new ContainerDeletedEventArgs(containerId, services.Values.ToList()));
+                _registrar.OnContainerDeleted(this, new ContainerDeletedEventArgs(containerId, services.Values.ToList()));
 
                 _containerServices.Remove(containerId);
             }
@@ -126,6 +149,11 @@ namespace Emissary.Core
             public ContainerService GetContainerService(string containerId, string serviceName)
             {
                 return _containerServices[containerId][serviceName];
+            }
+
+            public void Dispose()
+            {
+                _disposeAction.Invoke();
             }
         }
     }

@@ -1,4 +1,5 @@
 ﻿using System.Threading;
+using System.Threading.Tasks;
 
 using Emissary.Core;
 
@@ -10,23 +11,23 @@ namespace Emissary.Agents
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        public void Monitor(ContainerRegistrar registrar, CancellationToken token)
+        public void Monitor(IContainerRegistrar registrar, CancellationToken token)
         {
-            token.Register(() => Cleanup(registrar));
+            token.Register(async () => await Cleanup(registrar));
         }
 
-        private void Cleanup(ContainerRegistrar registrar)
+        private async Task Cleanup(IContainerRegistrar registrar)
         {
             Logger.Info("A shutdown event has been captured, will begin cleanup logic.");
 
-            registrar.Operate(transaction =>
+            using (var transaction = await registrar.BeginTransaction())
             {
                 foreach (var containerId in transaction.GetContainers())
                 {
                     Logger.Info($"Removing container [{containerId}].");
                     transaction.DeleteContainer(containerId);
                 }
-            });
+            }
 
             Logger.Info("Cleanup completed.");
         }

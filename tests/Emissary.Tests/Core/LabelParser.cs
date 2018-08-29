@@ -6,7 +6,7 @@ using FluentAssertions;
 
 using Xunit;
 
-namespace Emissary.Tests.Discovery
+namespace Emissary.Tests.Core
 {
     public class LabelParser
     {

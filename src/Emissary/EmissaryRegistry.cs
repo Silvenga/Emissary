@@ -6,6 +6,7 @@ using Consul;
 using Docker.DotNet;
 
 using Emissary.Agents;
+using Emissary.Core;
 
 using Lamar;
 
@@ -48,6 +49,7 @@ namespace Emissary
                 });
             });
 
+            For<IContainerRegistrar>().Add<ContainerRegistrar>();
             For<IAgent>().Add<ContainerDiscoveryAgent>();
             For<IAgent>().Add<ServiceRegistrationAgent>();
             For<IAgent>().Add<CleanupAgent>();

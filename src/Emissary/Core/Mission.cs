@@ -16,12 +16,12 @@ namespace Emissary.Core
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        private readonly ContainerRegistrar _registrar;
+        private readonly IContainerRegistrar _registrar;
         private readonly ICollection<IAgent> _agents;
         private readonly JobScheduler _scheduler;
         private readonly CancellationTokenSource _tokenSource = new CancellationTokenSource();
 
-        public Mission(ContainerRegistrar registrar, List<IAgent> agents, JobScheduler scheduler)
+        public Mission(IContainerRegistrar registrar, List<IAgent> agents, JobScheduler scheduler)
         {
             _registrar = registrar;
             _agents = agents;

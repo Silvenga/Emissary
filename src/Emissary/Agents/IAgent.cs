@@ -6,6 +6,6 @@ namespace Emissary.Agents
 {
     public interface IAgent
     {
-        void Monitor(ContainerRegistrar registrar, CancellationToken token);
+        void Monitor(IContainerRegistrar registrar, CancellationToken token);
     }
 }

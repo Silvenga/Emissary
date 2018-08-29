@@ -22,18 +22,17 @@ namespace Emissary.Agents
             _client = client;
         }
 
-        public void Monitor(ContainerRegistrar registrar, CancellationToken token)
+        public void Monitor(IContainerRegistrar registrar, CancellationToken token)
         {
             _scheduler.ScheduleRecurring<ContainerDiscoveryAgent>(() => Poll(registrar, token), token);
         }
 
-        private async Task Poll(ContainerRegistrar registrar, CancellationToken token)
+        private async Task Poll(IContainerRegistrar registrar, CancellationToken token)
         {
-            var desiredContainers = await _client.GetContainerServices(token);
-
-            registrar.Operate(transation =>
+            using (var transaction = await registrar.BeginTransaction())
             {
-                var currentContainers = transation.GetContainers();
+                var desiredContainers = await _client.GetContainerServices(token);
+                var currentContainers = transaction.GetContainers();
 
                 var newContainers = from containerId in desiredContainers.Select(x => x.ContainerId).Except(currentContainers).Distinct()
                                     from containerService in desiredContainers.Where(x => x.ContainerId == containerId)
@@ -46,20 +45,20 @@ namespace Emissary.Agents
                 foreach (var service in newContainers)
                 {
                     Logger.Info($"Discovered service [{service.ServiceName}] for container [{service.ContainerId}].");
-                    transation.AddContainerService(service);
+                    transaction.AddContainerService(service);
                 }
 
                 foreach (var service in updatedContainers)
                 {
-                    transation.UpdateContainerService(service);
+                    transaction.UpdateContainerService(service);
                 }
 
                 foreach (var containerId in extraContainers)
                 {
                     Logger.Info($"Container [{containerId}] was removed.");
-                    transation.DeleteContainer(containerId);
+                    transaction.DeleteContainer(containerId);
                 }
-            });
+            }
         }
     }
 }
