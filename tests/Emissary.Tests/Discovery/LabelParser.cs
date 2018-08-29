@@ -65,6 +65,20 @@ namespace Emissary.Tests.Discovery
         }
 
         [Fact]
+        public void When_port_is_not_given_can_parse_service_tags()
+        {
+            const string label = "name;tags=a,b,c";
+
+            // Act
+            var (success, result) = _parser.TryParseValue(label, 80);
+
+            // Assert
+            success.Should().BeTrue();
+            result.ServicePort.Should().Be(80);
+            result.ServiceTags.Should().ContainInOrder("a", "b", "c");
+        }
+
+        [Fact]
         public void When_label_is_incorrect_do_not_throw()
         {
             const string label = "some value";
