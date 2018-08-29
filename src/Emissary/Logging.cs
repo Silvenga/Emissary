@@ -4,7 +4,7 @@ using NLog.Targets;
 
 namespace Emissary
 {
-    public class Logging
+    public static class Logging
     {
         public static void Configure()
         {

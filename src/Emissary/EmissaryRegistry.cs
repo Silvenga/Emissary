@@ -22,13 +22,14 @@ namespace Emissary
                                            .AddJsonFile("appsettings.json", true)
                                            .AddEnvironmentVariables()
                                            .Build();
+            var emissaryConfiguration = new EmissaryConfiguration(configuration);
 
-            For<IConfiguration>().Use(configuration);
+            For<EmissaryConfiguration>().Use(emissaryConfiguration);
 
             For<DockerClientConfiguration>().Use(x =>
             {
-                var config = x.GetInstance<IConfiguration>();
-                return new DockerClientConfiguration(new Uri(config["Docker:Host"] ?? "unix:///var/run/docker.sock"));
+                var config = x.GetInstance<EmissaryConfiguration>();
+                return new DockerClientConfiguration(new Uri(config.DockerHost));
             });
             For<DockerClient>().Use(x =>
             {
@@ -38,12 +39,12 @@ namespace Emissary
 
             For<ConsulClient>().Use(x =>
             {
-                var config = x.GetInstance<IConfiguration>();
+                var config = x.GetInstance<EmissaryConfiguration>();
                 return new ConsulClient(clientConfiguration =>
                 {
-                    clientConfiguration.Token = config["Consul:Token"];
-                    clientConfiguration.Address = new Uri(config["Consul:Host"] ?? "http://localhost:8500");
-                    clientConfiguration.Datacenter = config["Consul:Datacenter"];
+                    clientConfiguration.Token = config.ConsulToken;
+                    clientConfiguration.Address = new Uri(config.ConsulHost);
+                    clientConfiguration.Datacenter = config.ConsulDatacenter;
                 });
             });
 
