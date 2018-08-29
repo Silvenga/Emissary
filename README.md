@@ -25,9 +25,9 @@ The network should be `host` to allow **Emissary** to access the local Consul ag
 For container services to be discovered, the container must be anotated with Docker labels, see Docker's [configuration docs](https://docs.docker.com/config/labels-custom-metadata/) for more information. Currently, a single label type exists representing a Consul service:
 
 ```
-com.silvenga.emissary.service[-1..n] = <service name>;<service port>[;tags=tag1,tag2]
+com.silvenga.emissary.service[-1..n] = <service name>[;service port][;tags=tag1,tag2]
 ```
-Multiple services can be described by incrementing the label key. Tags are optional, multiple tags are delimited with commas.
+Multiple services can be described by incrementing the label key. Tags are optional, multiple tags are delimited with commas. The service port is optional if the container defines a single published port.
 
 For example:
 ```
@@ -59,15 +59,36 @@ Will create the following service in Consul:
 
 ## Examples
 
+### Service Labels
+
 ```yml
 version: "3"
 services:
-  apache:
+  apache-1:
+    image: httpd:alpine
+    ports:
+      - 80:80
+    labels:
+      com.silvenga.emissary.service-1: test-service # Creates a service using the port 80.
+  apache-2:
     image: httpd:alpine
     ports:
       - 80:80
       - 443:443
     labels:
-      com.silvenga.emissary.service-1: test-service;80
+      com.silvenga.emissary.service-1: test-service;80 # Service ports must be specified here because more then one port is exposed.
       com.silvenga.emissary.service-2: test-service;443;tags=tag1,test2
+```
+
+### Emissary Compose
+
+```
+version: "3"
+services:
+  emissary:
+    image: silvenga/emissary
+    network_mode: host
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    restart: unless-stopped
 ```
