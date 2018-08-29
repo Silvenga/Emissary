@@ -9,8 +9,8 @@ namespace Emissary.Models
         [Value(0, Required = true)]
         public string ServiceName { get; set; }
 
-        [Value(1, Required = true)]
-        public int ServicePort { get; set; }
+        [Value(1, Required = false)]
+        public int? ServicePort { get; set; }
 
         [Option("tags", Separator = ',')]
         public IReadOnlyList<string> ServiceTags { get; set; }

@@ -77,6 +77,31 @@ namespace Emissary.Tests.Discovery
         }
 
         [Fact]
+        public void When_no_port_is_given_use_a_single_default_port()
+        {
+            const string label = "some value";
+
+            // Act
+            var (success, result) = _parser.TryParseValue(label, 80);
+
+            // Assert
+            success.Should().BeTrue();
+            result.ServicePort.Should().Be(80);
+        }
+
+        [Fact]
+        public void When_no_port_is_given_and_multiple_ports_exist_fail_parsing()
+        {
+            const string label = "some value";
+
+            // Act
+            var (success, _) = _parser.TryParseValue(label, 80, 81);
+
+            // Assert
+            success.Should().BeFalse();
+        }
+
+        [Fact]
         public void When_given_correct_label_key_return_true()
         {
             const string key = "com.silvenga.emissary.service";
