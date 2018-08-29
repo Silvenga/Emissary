@@ -45,7 +45,7 @@ namespace Emissary.Agents
 
                 foreach (var service in newContainers)
                 {
-                    Logger.Info($"Discovered service [{service.ServiceName}] under container [{service.ContainerId}].");
+                    Logger.Info($"Discovered service [{service.ServiceName}] for container [{service.ContainerId}].");
                     transation.AddContainerService(service);
                 }
 

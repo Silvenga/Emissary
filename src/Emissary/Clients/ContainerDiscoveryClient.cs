@@ -46,16 +46,22 @@ namespace Emissary.Clients
 
         public async Task<IReadOnlyList<ContainerService>> GetContainerServices(CancellationToken cancellationToken)
         {
-            var containers = await GetContainers(cancellationToken);
-            var services = from container in containers
+            var dockerResult = await _client.Containers.ListContainersAsync(new ContainersListParameters
+            {
+                All = true
+            }, cancellationToken);
+
+            var services = from container in dockerResult.Where(x => x.State == "running")
+                           let ports = container.Ports.Select<Port, int>(x => x.PublicPort).ToArray()
                            from label in container.Labels.Where(x => _labelParser.CanParseLabel(x.Key))
-                           let parseResult = _labelParser.TryParseValue(label.Value)
+                           let parseResult = _labelParser.TryParseValue(label.Value, ports)
                            let service = parseResult.Result
                            where parseResult.Success
                            select new ContainerService
                            {
-                               ContainerId = container.Id,
-                               ServicePort = service.ServicePort,
+                               ContainerId = container.ID,
+                               // ReSharper disable once PossibleInvalidOperationException
+                               ServicePort = service.ServicePort.Value,
                                ServiceName = service.ServiceName,
                                ServiceTags = service.ServiceTags,
                                ContainerStatus = container.Status,
