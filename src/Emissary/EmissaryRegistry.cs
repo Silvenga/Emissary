@@ -50,7 +50,8 @@ namespace Emissary
             });
 
             For<IContainerRegistrar>().Add<ContainerRegistrar>();
-            For<IAgent>().Add<ContainerDiscoveryAgent>();
+            For<IAgent>().Add<PollingContainerDiscoveryAgent>();
+            For<IAgent>().Add<SubscribingContainerDiscoveryAgent>();
             For<IAgent>().Add<ServiceRegistrationAgent>();
             For<IAgent>().Add<CleanupAgent>();
         }

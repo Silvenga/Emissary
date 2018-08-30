@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -9,14 +10,14 @@ using NLog;
 
 namespace Emissary.Agents
 {
-    public class ContainerDiscoveryAgent : IAgent
+    public class PollingContainerDiscoveryAgent : IAgent
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         private readonly JobScheduler _scheduler;
         private readonly ContainerDiscoveryClient _client;
 
-        public ContainerDiscoveryAgent(JobScheduler scheduler, ContainerDiscoveryClient client)
+        public PollingContainerDiscoveryAgent(JobScheduler scheduler, ContainerDiscoveryClient client)
         {
             _scheduler = scheduler;
             _client = client;
@@ -24,27 +25,28 @@ namespace Emissary.Agents
 
         public void Monitor(IContainerRegistrar registrar, CancellationToken token)
         {
-            _scheduler.ScheduleRecurring<ContainerDiscoveryAgent>(() => Poll(registrar, token), token);
+            _scheduler.ScheduleRecurring<PollingContainerDiscoveryAgent>(() => Poll(registrar, token), token, TimeSpan.FromMinutes(1));
         }
 
         private async Task Poll(IContainerRegistrar registrar, CancellationToken token)
         {
             using (var transaction = await registrar.BeginTransaction())
             {
-                var desiredContainers = await _client.GetContainerServices(token);
+                var desiredContainers = await _client.GetRunningContainerServices(token);
+                var desiredContainerIds = desiredContainers.Select(x => x.ContainerId).ToList();
                 var currentContainers = transaction.GetContainers();
 
-                var newContainers = from containerId in desiredContainers.Select(x => x.ContainerId).Except(currentContainers).Distinct()
+                var newContainers = from containerId in desiredContainerIds.Except(currentContainers).Distinct()
                                     from containerService in desiredContainers.Where(x => x.ContainerId == containerId)
                                     select containerService;
                 var updatedContainers = from c in desiredContainers
                                         from v in currentContainers.Where(x => c.ContainerId == x)
                                         select c;
-                var extraContainers = currentContainers.Except(desiredContainers.Select(x => x.ContainerId)).Distinct();
+                var extraContainers = currentContainers.Except(desiredContainerIds).Distinct();
 
                 foreach (var service in newContainers)
                 {
-                    Logger.Info($"Discovered service [{service.ServiceName}] for container [{service.ContainerId}].");
+                    Logger.Info($"Discovered services [{service.ServiceName}] for container [{service.ContainerId}].");
                     transaction.AddContainerService(service);
                 }
 

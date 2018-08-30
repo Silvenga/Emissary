@@ -13,6 +13,8 @@ namespace Emissary.Models
 
         public IReadOnlyList<string> ServiceTags { get; set; }
 
+        public string ContainerState { get; set; }
+
         public string ContainerStatus { get; set; }
 
         public DateTime ContainerCreationOn { get; set; }

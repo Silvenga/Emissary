@@ -29,6 +29,7 @@ namespace Emissary.Core
         IReadOnlyList<ContainerService> GetAllContainerServices();
         IReadOnlyList<ContainerService> GetContainerServices(string containerId);
         ContainerService GetContainerService(string containerId, string serviceName);
+        bool ContainerServiceExists(string containerId, string serviceName);
     }
 
     [UsedImplicitly]
@@ -149,6 +150,11 @@ namespace Emissary.Core
             public ContainerService GetContainerService(string containerId, string serviceName)
             {
                 return _containerServices[containerId][serviceName];
+            }
+
+            public bool ContainerServiceExists(string containerId, string serviceName)
+            {
+                return _containerServices.ContainsKey(containerId) && _containerServices[containerId].ContainsKey(serviceName);
             }
 
             public void Dispose()
