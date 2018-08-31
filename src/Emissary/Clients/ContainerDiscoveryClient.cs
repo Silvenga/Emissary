@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,7 +47,7 @@ namespace Emissary.Clients
         {
             var result = await _client.Containers.InspectContainerAsync(id, cancellationToken);
 
-            var services = from container in new[] { result }.Where(x => x.State.Status == "running")
+            var services = from container in new[] {result}.Where(x => x.State.Status == "running")
                            let ports = GetPorts(container).ToArray()
                            from label in GetLabels(container).Where(x => _labelParser.CanParseLabel(x.Key))
                            let parseResult = _labelParser.TryParseValue(label.Value, ports)

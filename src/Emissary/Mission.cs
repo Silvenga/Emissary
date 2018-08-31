@@ -32,7 +32,6 @@ namespace Emissary
 
         public Task Start(string[] args)
         {
-            var a = Assembly.GetEntryAssembly();
             Logger.Info($"The emissary mission has begun using version {Assembly.GetEntryAssembly().GetName().Version}.");
 
             Logger.Info($"Starting agents [{string.Join(", ", _agents.Select(x => x.GetType().Name))}].");

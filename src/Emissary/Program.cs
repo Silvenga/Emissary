@@ -2,8 +2,6 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-using Emissary.Core;
-
 using Lamar;
 
 namespace Emissary
