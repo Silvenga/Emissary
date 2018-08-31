@@ -46,7 +46,7 @@ namespace Emissary.Agents
 
                 foreach (var service in newContainers)
                 {
-                    Logger.Info($"Discovered services [{service.ServiceName}] for container [{service.ContainerId}].");
+                    Logger.Info($"Discovered services [{service.ServiceName}] for container [{service.ContainerId.ToShortContainerName()}].");
                     transaction.AddContainerService(service);
                 }
 
@@ -57,7 +57,7 @@ namespace Emissary.Agents
 
                 foreach (var containerId in extraContainers)
                 {
-                    Logger.Info($"Container [{containerId}] was removed.");
+                    Logger.Info($"Container [{containerId.ToShortContainerName()}] was removed.");
                     transaction.DeleteContainer(containerId);
                 }
             }

@@ -36,7 +36,7 @@ namespace Emissary.Agents
         {
             _client.RegisterContainerService(e.ContainerService, TimeSpan.FromSeconds(30), CancellationToken.None).Wait();
 
-            Logger.Info($"Registering service [{e.ContainerService.ServiceName}] for container [{e.ContainerId}].");
+            Logger.Info($"Registering service [{e.ContainerService.ServiceName}] for container [{e.ContainerId.ToShortContainerName()}].");
         }
 
         private void RegistrarOnContainerDeleted(object sender, ContainerDeletedEventArgs e)
@@ -46,7 +46,7 @@ namespace Emissary.Agents
                 _client.DeregisterContainerService(e.ContainerId, service.ServiceName, CancellationToken.None).Wait();
             }
 
-            Logger.Info($"Deregistered container [{e.ContainerId}] services [{string.Join(", ", e.Services.Select(x => x.ServiceName))}].");
+            Logger.Info($"Deregistered container [{e.ContainerId.ToShortContainerName()}] services [{string.Join(", ", e.Services.Select(x => x.ServiceName))}].");
         }
 
         private async Task MaintenanceLoop(IContainerRegistrar registrar, CancellationToken token)

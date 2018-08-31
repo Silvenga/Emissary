@@ -24,7 +24,7 @@ namespace Emissary.Agents
             {
                 foreach (var containerId in transaction.GetContainers())
                 {
-                    Logger.Info($"Removing container [{containerId}].");
+                    Logger.Info($"Removing container [{containerId.ToShortContainerName()}].");
                     transaction.DeleteContainer(containerId);
                 }
             }

@@ -77,7 +77,7 @@ namespace Emissary.Agents
             }
             else
             {
-                Logger.Info($"Recieved creation event of services [{service.ServiceName}] for container [{service.ContainerId}].");
+                Logger.Info($"Recieved creation event of services [{service.ServiceName}] for container [{service.ContainerId.ToShortContainerName()}].");
                 transaction.AddContainerService(service);
             }
         }
@@ -87,7 +87,7 @@ namespace Emissary.Agents
             var exists = transaction.GetContainers().Contains(containerId);
             if (exists)
             {
-                Logger.Info($"Recieved event that container [{containerId}] is being removed.");
+                Logger.Info($"Recieved event that container [{containerId.ToShortContainerName()}] is being removed.");
                 transaction.DeleteContainer(containerId);
             }
         }
