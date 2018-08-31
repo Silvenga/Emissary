@@ -1,15 +1,17 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
 using Emissary.Agents;
+using Emissary.Core;
 
 using JetBrains.Annotations;
 
 using NLog;
 
-namespace Emissary.Core
+namespace Emissary
 {
     [UsedImplicitly]
     public class Mission
@@ -30,7 +32,8 @@ namespace Emissary.Core
 
         public Task Start(string[] args)
         {
-            Logger.Info("The emissary mission has begun.");
+            var a = Assembly.GetEntryAssembly();
+            Logger.Info($"The emissary mission has begun using version {Assembly.GetEntryAssembly().GetName().Version}.");
 
             Logger.Info($"Starting agents [{string.Join(", ", _agents.Select(x => x.GetType().Name))}].");
             foreach (var agent in _agents)
