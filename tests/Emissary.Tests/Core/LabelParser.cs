@@ -10,7 +10,7 @@ namespace Emissary.Tests.Core
 {
     public class LabelParser
     {
-        private readonly ServiceLabelParser _parser = new ServiceLabelParser(new Parser());
+        private readonly IServiceLabelParser _parser = new ServiceLabelParser(new Parser());
 
         [Fact]
         public void Can_parse_service_name()

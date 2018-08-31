@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,10 +16,10 @@ namespace Emissary.Clients
 {
     public class ContainerDiscoveryClient
     {
-        private readonly DockerClient _client;
-        private readonly ServiceLabelParser _labelParser;
+        private readonly IDockerClient _client;
+        private readonly IServiceLabelParser _labelParser;
 
-        public ContainerDiscoveryClient(DockerClient client, ServiceLabelParser labelParser)
+        public ContainerDiscoveryClient(IDockerClient client, IServiceLabelParser labelParser)
         {
             _client = client;
             _labelParser = labelParser;
@@ -48,8 +49,8 @@ namespace Emissary.Clients
             var result = await _client.Containers.InspectContainerAsync(id, cancellationToken);
 
             var services = from container in new[] { result }.Where(x => x.State.Status == "running")
-                           let ports = container.NetworkSettings.Ports.Values.SelectMany(x => x).Select(x => int.Parse(x.HostPort)).ToArray()
-                           from label in container.Config.Labels.Where(x => _labelParser.CanParseLabel(x.Key))
+                           let ports = GetPorts(container).ToArray()
+                           from label in GetLabels(container).Where(x => _labelParser.CanParseLabel(x.Key))
                            let parseResult = _labelParser.TryParseValue(label.Value, ports)
                            let service = parseResult.Result
                            where parseResult.Success
@@ -65,6 +66,22 @@ namespace Emissary.Clients
                                ContainerState = container.State.Status
                            };
             return services.ToList();
+        }
+
+        private IEnumerable<int> GetPorts(ContainerInspectResponse response)
+        {
+            var result = from port in response?.NetworkSettings?.Ports ?? Enumerable.Empty<KeyValuePair<string, IList<PortBinding>>>()
+                         from portBinding in port.Value ?? Enumerable.Empty<PortBinding>()
+                         let hostPort = portBinding.HostPort
+                         where int.TryParse(hostPort, out _)
+                         select int.Parse(hostPort);
+
+            return result;
+        }
+
+        private IEnumerable<KeyValuePair<string, string>> GetLabels(ContainerInspectResponse response)
+        {
+            return response?.Config?.Labels ?? Enumerable.Empty<KeyValuePair<string, string>>();
         }
 
         public async Task<IReadOnlyList<ContainerService>> GetRunningContainerServices(CancellationToken cancellationToken)

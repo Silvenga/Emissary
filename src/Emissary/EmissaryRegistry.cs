@@ -32,7 +32,7 @@ namespace Emissary
                 var config = x.GetInstance<EmissaryConfiguration>();
                 return new DockerClientConfiguration(new Uri(config.DockerHost));
             });
-            For<DockerClient>().Use(x =>
+            For<IDockerClient>().Use(x =>
             {
                 var config = x.GetInstance<DockerClientConfiguration>();
                 return config.CreateClient();
@@ -50,6 +50,7 @@ namespace Emissary
             });
 
             For<IContainerRegistrar>().Add<ContainerRegistrar>();
+            For<IServiceLabelParser>().Add<ServiceLabelParser>();
             For<IAgent>().Add<PollingContainerDiscoveryAgent>();
             For<IAgent>().Add<SubscribingContainerDiscoveryAgent>();
             For<IAgent>().Add<ServiceRegistrationAgent>();

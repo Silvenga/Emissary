@@ -7,7 +7,13 @@ using Emissary.Models;
 
 namespace Emissary.Core
 {
-    public class ServiceLabelParser
+    public interface IServiceLabelParser
+    {
+        bool CanParseLabel(string key);
+        (bool Success, ServiceLabel Result) TryParseValue(string value, params int[] ports);
+    }
+
+    public class ServiceLabelParser : IServiceLabelParser
     {
         private readonly Parser _parser;
 
