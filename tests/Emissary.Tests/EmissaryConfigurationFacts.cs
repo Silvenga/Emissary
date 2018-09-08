@@ -30,7 +30,7 @@ namespace Emissary.Tests
             _mockConfiguration[Arg.Any<string>()].ReturnsNull();
 
             // Act
-            var result = _emissaryConfiguration.Validate();
+            var result = _emissaryConfiguration.Validate(out _);
 
             // Assert
             result.Should().BeTrue();
@@ -45,7 +45,7 @@ namespace Emissary.Tests
             _mockConfiguration["Docker:Host"].Returns(fakeValue);
 
             // Act
-            var result = _emissaryConfiguration.Validate();
+            var result = _emissaryConfiguration.Validate(out _);
 
             // Assert
             result.Should().BeFalse();
@@ -60,7 +60,20 @@ namespace Emissary.Tests
             _mockConfiguration["Consul:Host"].Returns(fakeValue);
 
             // Act
-            var result = _emissaryConfiguration.Validate();
+            var result = _emissaryConfiguration.Validate(out _);
+
+            // Assert
+            result.Should().BeFalse();
+        }
+
+        [Fact]
+        public void ConsulHost_should_require_a_valid_schema()
+        {
+            _mockConfiguration[Arg.Any<string>()].ReturnsNull();
+            _mockConfiguration["Consul:Host"].Returns("host:8500");
+
+            // Act
+            var result = _emissaryConfiguration.Validate(out _);
 
             // Assert
             result.Should().BeFalse();

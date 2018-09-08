@@ -8,7 +8,7 @@ namespace Emissary
 {
     public static class Program
     {
-        private static async Task Main(string[] args)
+        private static async Task<int> Main(string[] args)
         {
             Logging.Configure();
 
@@ -16,9 +16,14 @@ namespace Emissary
 
             var mission = container.GetInstance<Mission>();
 
-            await mission.Start(args);
-            await WaitForExit();
+            var success = await mission.Start(args);
+            if (success)
+            {
+                await WaitForExit();
+            }
             await mission.Stop();
+
+            return success ? 0 : 1;
         }
 
         private static async Task WaitForExit()

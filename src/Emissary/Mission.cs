@@ -21,27 +21,43 @@ namespace Emissary
         private readonly IContainerRegistrar _registrar;
         private readonly ICollection<IAgent> _agents;
         private readonly JobScheduler _scheduler;
+        private readonly EmissaryConfiguration _configuration;
+
         private readonly CancellationTokenSource _tokenSource = new CancellationTokenSource();
 
-        public Mission(IContainerRegistrar registrar, List<IAgent> agents, JobScheduler scheduler)
+        // ReSharper disable once SuggestBaseTypeForParameter
+        public Mission(IContainerRegistrar registrar, List<IAgent> agents, JobScheduler scheduler, EmissaryConfiguration configuration)
         {
             _registrar = registrar;
             _agents = agents;
             _scheduler = scheduler;
+            _configuration = configuration;
         }
 
-        public Task Start(string[] args)
+        public Task<bool> Start(string[] args)
         {
             Logger.Info($"The emissary mission has begun using version {Assembly.GetEntryAssembly().GetName().Version}.");
+
+            var configurationValid = _configuration.Validate(out var results);
+            if (!configurationValid)
+            {
+                foreach (var result in results)
+                {
+                    Logger.Error(result);
+                }
+                Logger.Info("Configruations are invalid, will shutdown.");
+                return Task.FromResult(false);
+            }
+            Logger.Info("Configurations are valid.");
 
             Logger.Info($"Starting agents [{string.Join(", ", _agents.Select(x => x.GetType().Name))}].");
             foreach (var agent in _agents)
             {
+                Logger.Info($"Starting agent [{agent}].");
                 agent.Monitor(_registrar, _tokenSource.Token);
             }
-            Logger.Info("Completed starting agents.");
 
-            return Task.CompletedTask;
+            return Task.FromResult(true);
         }
 
         public async Task Stop()

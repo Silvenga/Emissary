@@ -23,7 +23,7 @@ namespace Emissary
 
         public string ConsulToken => _configuration["Consul:Token"];
 
-        [Required, ValidUri]
+        [Required, ValidUri(AllowedSchemas = new[] { "http", "https" })]
         public string ConsulHost => _configuration["Consul:Host"] ?? "http://localhost:8500";
 
         public string ConsulDatacenter => _configuration["Consul:Datacenter"];
@@ -31,10 +31,10 @@ namespace Emissary
         [Required, RegularExpression("\\d+")]
         public string PollingInterval => _configuration["PollingInterval"] ?? TimeSpan.FromMinutes(30).TotalSeconds.ToString(CultureInfo.InvariantCulture);
 
-        public bool Validate()
+        public bool Validate(out List<ValidationResult> results)
         {
             var context = new ValidationContext(this, null, null);
-            var results = new List<ValidationResult>();
+            results = new List<ValidationResult>();
 
             var result = Validator.TryValidateObject(this, context, results, true);
             return result;
