@@ -12,7 +12,7 @@ namespace Emissary
 
             var consoleTarget = new ColoredConsoleTarget("console")
             {
-                Layout = "${longdate} ${level:uppercase=true} ${logger:shortName=true}: ${message:WithException=true}"
+                Layout = "${date:format=yyyy-MM-dd HH\\:mm\\:ss} ${level:uppercase=true} ${logger:shortName=true}: ${message:WithException=true}"
             };
             config.AddTarget(consoleTarget);
             config.AddRuleForAllLevels(consoleTarget);
