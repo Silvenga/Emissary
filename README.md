@@ -56,6 +56,7 @@ Will create the following service in Consul:
 | `CONSUL__HOST`       | Yes       | `http://localhost:8500` | The API of the local Consul agent - defaults to localhost and the default Consul port if not specified.
 | `CONSUL__TOKEN`      | No        | `null` | An ACL token to use on API requests to Consul (not required by default). Defaults to disabled if not specified. See Consul's [ACL guide](https://www.consul.io/docs/guides/acl.html) for more info.
 | `CONSUL__DATACENTER` | No        | `null` | The Consul datacenter to use - defaults at Consul's default if not specified (the datacenter specified in the Consul agent's configurations).
+| `POLLINGINTERVAL`    | Yes       | `60` | The interval in seconds to poll for container updates (creations/deletions). Polling is normally not required, and is only used as a backup if subscribing to the Docker event stream fails. This value must be greater then 0.
 
 ## Examples
 
