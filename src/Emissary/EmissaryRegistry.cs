@@ -49,8 +49,10 @@ namespace Emissary
                 });
             });
 
-            For<IContainerRegistrar>().Add<ContainerRegistrar>();
-            For<IServiceLabelParser>().Add<ServiceLabelParser>();
+            For<IContainerRegistrar>().Use<ContainerRegistrar>();
+            For<JobScheduler>().Use<JobScheduler>().Singleton();
+            For<IServiceLabelParser>().Use<ServiceLabelParser>();
+
             For<IAgent>().Add<PollingContainerDiscoveryAgent>();
             For<IAgent>().Add<SubscribingContainerDiscoveryAgent>();
             For<IAgent>().Add<ServiceRegistrationAgent>();

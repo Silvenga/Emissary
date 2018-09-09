@@ -24,12 +24,12 @@ namespace Emissary.Agents
             _client = client;
         }
 
-        public void Monitor(IContainerRegistrar registrar, CancellationToken token)
+        public async Task Monitor(IContainerRegistrar registrar, CancellationToken token)
         {
             registrar.ContainerServiceCreated += RegistrarOnContainerServiceCreated;
             registrar.ContainerDeleted += RegistrarOnContainerDeleted;
 
-            _scheduler.ScheduleRecurring<ServiceRegistrationAgent>(() => MaintenanceLoop(registrar, token), token);
+            await _scheduler.ScheduleRecurring<ServiceRegistrationAgent>(() => MaintenanceLoop(registrar, token), token);
         }
 
         private void RegistrarOnContainerServiceCreated(object sender, ContainerServiceCreatedEventArgs e)

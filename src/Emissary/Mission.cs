@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,17 +19,16 @@ namespace Emissary
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         private readonly IContainerRegistrar _registrar;
-        private readonly ICollection<IAgent> _agents;
+        private readonly Lazy<List<IAgent>> _lazyAgents;
         private readonly JobScheduler _scheduler;
         private readonly EmissaryConfiguration _configuration;
 
         private readonly CancellationTokenSource _tokenSource = new CancellationTokenSource();
 
-        // ReSharper disable once SuggestBaseTypeForParameter
-        public Mission(IContainerRegistrar registrar, List<IAgent> agents, JobScheduler scheduler, EmissaryConfiguration configuration)
+        public Mission(IContainerRegistrar registrar, Lazy<List<IAgent>> lazyAgents, JobScheduler scheduler, EmissaryConfiguration configuration)
         {
             _registrar = registrar;
-            _agents = agents;
+            _lazyAgents = lazyAgents;
             _scheduler = scheduler;
             _configuration = configuration;
         }
@@ -45,16 +44,21 @@ namespace Emissary
                 {
                     Logger.Error(result);
                 }
+
                 Logger.Info("Configruations are invalid, will shutdown.");
                 return Task.FromResult(false);
             }
+
             Logger.Info("Configurations are valid.");
-            
-            foreach (var agent in _agents)
+
+            var agents = _lazyAgents.Value;
+            foreach (var agent in agents)
             {
                 Logger.Info($"Starting agent [{agent}].");
                 agent.Monitor(_registrar, _tokenSource.Token);
             }
+
+            Logger.Info($"{_scheduler.JobsCount} jobs are now active.");
 
             return Task.FromResult(true);
         }

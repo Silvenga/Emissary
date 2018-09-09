@@ -1,4 +1,5 @@
 ﻿using System.Threading;
+using System.Threading.Tasks;
 
 using Emissary.Core;
 
@@ -6,6 +7,6 @@ namespace Emissary.Agents
 {
     public interface IAgent
     {
-        void Monitor(IContainerRegistrar registrar, CancellationToken token);
+        Task Monitor(IContainerRegistrar registrar, CancellationToken token);
     }
 }

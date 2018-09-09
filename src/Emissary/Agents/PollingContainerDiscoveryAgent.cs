@@ -23,9 +23,9 @@ namespace Emissary.Agents
             _client = client;
         }
 
-        public void Monitor(IContainerRegistrar registrar, CancellationToken token)
+        public async Task Monitor(IContainerRegistrar registrar, CancellationToken token)
         {
-            _scheduler.ScheduleRecurring<PollingContainerDiscoveryAgent>(() => Poll(registrar, token), token, TimeSpan.FromMinutes(1));
+            await _scheduler.ScheduleRecurring<PollingContainerDiscoveryAgent>(() => Poll(registrar, token), token, TimeSpan.FromMinutes(1));
         }
 
         private async Task Poll(IContainerRegistrar registrar, CancellationToken token)

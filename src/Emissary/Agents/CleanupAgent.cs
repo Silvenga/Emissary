@@ -11,9 +11,10 @@ namespace Emissary.Agents
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        public void Monitor(IContainerRegistrar registrar, CancellationToken token)
+        public Task Monitor(IContainerRegistrar registrar, CancellationToken token)
         {
             token.Register(async () => await Cleanup(registrar));
+            return Task.CompletedTask;
         }
 
         private async Task Cleanup(IContainerRegistrar registrar)
