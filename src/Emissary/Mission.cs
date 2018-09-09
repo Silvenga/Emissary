@@ -35,6 +35,15 @@ namespace Emissary
 
         public Task<bool> Start(string[] args)
         {
+            Logger.Info(@"  ______           _                           ");
+            Logger.Info(@" |  ____|         (_)                          ");
+            Logger.Info(@" | |__   _ __ ___  _ ___ ___  __ _ _ __ _   _  ");
+            Logger.Info(@" |  __| | '_ ` _ \| / __/ __|/ _` | '__| | | | ");
+            Logger.Info(@" | |____| | | | | | \__ \__ \ (_| | |  | |_| | ");
+            Logger.Info(@" |______|_| |_| |_|_|___/___/\__,_|_|   \__, | ");
+            Logger.Info(@"                                         __/ | ");
+            Logger.Info(@"                                        |___/  ");
+            Logger.Info("");
             Logger.Info($"The emissary mission has begun using version {Assembly.GetEntryAssembly().GetName().Version}.");
 
             var configurationValid = _configuration.Validate(out var results);
