@@ -49,8 +49,7 @@ namespace Emissary
                 return Task.FromResult(false);
             }
             Logger.Info("Configurations are valid.");
-
-            Logger.Info($"Starting agents [{string.Join(", ", _agents.Select(x => x.GetType().Name))}].");
+            
             foreach (var agent in _agents)
             {
                 Logger.Info($"Starting agent [{agent}].");

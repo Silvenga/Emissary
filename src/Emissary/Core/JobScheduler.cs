@@ -37,7 +37,10 @@ namespace Emissary.Core
                 }
                 catch (Exception e)
                 {
-                    logger.Warn(e, "Job failed while executing, the exception was handled.");
+                    if (!token.IsCancellationRequested)
+                    {
+                        logger.Warn(e, "Job failed while executing, the exception was handled.");
+                    }
                 }
 
                 await Task.Delay(delayBetweenLoops, token);
