@@ -29,7 +29,7 @@ namespace Emissary
         public string ConsulDatacenter => _configuration["Consul:Datacenter"];
 
         [Required, RegularExpression("\\d+")]
-        public string PollingInterval => _configuration["PollingInterval"] ?? TimeSpan.FromMinutes(30).TotalSeconds.ToString(CultureInfo.InvariantCulture);
+        public string PollingInterval => _configuration["PollingInterval"] ?? TimeSpan.FromMinutes(1).TotalSeconds.ToString(CultureInfo.InvariantCulture);
 
         public bool Validate(out List<ValidationResult> results)
         {

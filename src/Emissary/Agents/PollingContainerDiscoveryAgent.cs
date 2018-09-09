@@ -16,16 +16,19 @@ namespace Emissary.Agents
 
         private readonly JobScheduler _scheduler;
         private readonly ContainerDiscoveryClient _client;
+        private readonly EmissaryConfiguration _configuration;
 
-        public PollingContainerDiscoveryAgent(JobScheduler scheduler, ContainerDiscoveryClient client)
+        public PollingContainerDiscoveryAgent(JobScheduler scheduler, ContainerDiscoveryClient client, EmissaryConfiguration configuration)
         {
             _scheduler = scheduler;
             _client = client;
+            _configuration = configuration;
         }
 
         public async Task Monitor(IContainerRegistrar registrar, CancellationToken token)
         {
-            await _scheduler.ScheduleRecurring<PollingContainerDiscoveryAgent>(() => Poll(registrar, token), token, TimeSpan.FromMinutes(1));
+            var pollingInterval = TimeSpan.FromSeconds(int.Parse(_configuration.PollingInterval));
+            await _scheduler.ScheduleRecurring<PollingContainerDiscoveryAgent>(() => Poll(registrar, token), token, pollingInterval);
         }
 
         private async Task Poll(IContainerRegistrar registrar, CancellationToken token)
