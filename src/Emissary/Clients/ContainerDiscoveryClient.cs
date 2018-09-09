@@ -24,30 +24,11 @@ namespace Emissary.Clients
             _labelParser = labelParser;
         }
 
-        public async Task<IReadOnlyCollection<DiscoveredContainer>> GetContainers(CancellationToken cancellationToken)
-        {
-            var result = await _client.Containers.ListContainersAsync(new ContainersListParameters(), cancellationToken);
-
-            var containers = result
-                             .Where(x => x.State == "running")
-                             .Select(x => new DiscoveredContainer
-                             {
-                                 Id = x.ID,
-                                 Labels = x.Labels,
-                                 Created = x.Created,
-                                 Names = x.Names,
-                                 State = x.State,
-                                 Status = x.Status
-                             }).ToList();
-
-            return containers;
-        }
-
         public async Task<IReadOnlyList<ContainerService>> GetContainerService(string id, CancellationToken cancellationToken)
         {
             var result = await _client.Containers.InspectContainerAsync(id, cancellationToken);
 
-            var services = from container in new[] {result}.Where(x => x.State.Status == "running")
+            var services = from container in new[] { result }.Where(x => x.State.Status == "running")
                            let ports = GetPorts(container).ToArray()
                            from label in GetLabels(container).Where(x => _labelParser.CanParseLabel(x.Key))
                            let parseResult = _labelParser.TryParseValue(label.Value, ports)
@@ -62,7 +43,8 @@ namespace Emissary.Clients
                                ServiceTags = service.ServiceTags,
                                ContainerStatus = container.State.Status,
                                ContainerCreationOn = container.Created,
-                               ContainerState = container.State.Status
+                               ContainerState = container.State.Status,
+                               Image = container.Image
                            };
             return services.ToList();
         }
@@ -102,7 +84,8 @@ namespace Emissary.Clients
                                ServiceTags = service.ServiceTags,
                                ContainerStatus = container.Status,
                                ContainerCreationOn = container.Created,
-                               ContainerState = container.State
+                               ContainerState = container.State,
+                               Image = container.Image
                            };
             return services.ToList();
         }

@@ -18,5 +18,7 @@ namespace Emissary.Models
         public string ContainerStatus { get; set; }
 
         public DateTime ContainerCreationOn { get; set; }
+
+        public string Image { get; set; }
     }
 }

@@ -58,15 +58,21 @@ namespace Emissary.Agents
 
                 var checks = from desiredService in desiredServices
                              from consulService in consulServices.Where(x => x.ContainerId == desiredService.ContainerId)
+                             let status = ""
+                                          + $"Container: {desiredService.ContainerId.ToShortContainerName()}\n"
+                                          + $"    Image: {desiredService.Image}\n"
+                                          + $" Creation: {desiredService.ContainerCreationOn}\n"
+                                          + $"    State: {desiredService.ContainerState}\n"
+                                          + $"   Status: {desiredService.ContainerStatus}"
                              select new
                              {
-                                 desiredService.ContainerStatus,
+                                 Status = status,
                                  consulService.CheckId
                              };
 
                 foreach (var check in checks)
                 {
-                    await _client.MaintainService(check.CheckId, check.ContainerStatus, token);
+                    await _client.MaintainService(check.CheckId, check.Status, token);
                 }
             }
         }
