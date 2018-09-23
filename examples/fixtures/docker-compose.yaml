@@ -2,5 +2,9 @@ version: '3'
 services:
   always-failure:
     build: ./always-failure
+    labels:
+      com.silvenga.emissary.service: always-failure;80
   always-healthy:
     build: ./always-healthy
+    labels:
+      com.silvenga.emissary.service-1: always-healthy;443;tags=tag1,test2

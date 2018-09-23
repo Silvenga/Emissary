@@ -24,7 +24,15 @@ namespace Emissary.Clients
             _labelParser = labelParser;
         }
 
-        public async Task<IReadOnlyList<ContainerService>> GetContainerService(string id, CancellationToken cancellationToken)
+        public async Task<IReadOnlyList<ContainerService>> GetRunningContainerServices(CancellationToken cancellationToken)
+        {
+            var containers = await _client.Containers.ListContainersAsync(new ContainersListParameters(), cancellationToken);
+            var inspectTasks = containers.Select(x => GetContainerServicesById(x.ID, cancellationToken));
+            var results = await Task.WhenAll(inspectTasks);
+            return results.SelectMany(x => x).ToList();
+        }
+
+        public async Task<IReadOnlyList<ContainerService>> GetContainerServicesById(string id, CancellationToken cancellationToken)
         {
             var result = await _client.Containers.InspectContainerAsync(id, cancellationToken);
 
@@ -63,31 +71,6 @@ namespace Emissary.Clients
         private IEnumerable<KeyValuePair<string, string>> GetLabels(ContainerInspectResponse response)
         {
             return response?.Config?.Labels ?? Enumerable.Empty<KeyValuePair<string, string>>();
-        }
-
-        public async Task<IReadOnlyList<ContainerService>> GetRunningContainerServices(CancellationToken cancellationToken)
-        {
-            var dockerResult = await _client.Containers.ListContainersAsync(new ContainersListParameters(), cancellationToken);
-
-            var services = from container in dockerResult
-                           let ports = container.Ports.Select<Port, int>(x => x.PublicPort).ToArray()
-                           from label in container.Labels.Where(x => _labelParser.CanParseLabel(x.Key))
-                           let parseResult = _labelParser.TryParseValue(label.Value, ports)
-                           let service = parseResult.Result
-                           where parseResult.Success
-                           select new ContainerService
-                           {
-                               ContainerId = container.ID,
-                               // ReSharper disable once PossibleInvalidOperationException
-                               ServicePort = service.ServicePort.Value,
-                               ServiceName = service.ServiceName,
-                               ServiceTags = service.ServiceTags,
-                               ContainerStatus = container.Status,
-                               ContainerCreationOn = container.Created,
-                               ContainerState = container.State,
-                               Image = container.Image
-                           };
-            return services.ToList();
         }
 
         public async Task GetEvents(YieldingProgress<ContainerEvent> yieldingProgress, CancellationToken cancellationToken)

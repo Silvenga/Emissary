@@ -51,7 +51,7 @@ namespace Emissary.Agents
                         case "update":
                         case "start":
                         case "restart":
-                            var containerServices = await _client.GetContainerService(progress.ContainerId, token);
+                            var containerServices = await _client.GetContainerServicesById(progress.ContainerId, token);
                             foreach (var containerService in containerServices)
                             {
                                 ConsiderAddedService(transaction, containerService);
