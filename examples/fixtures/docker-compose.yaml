@@ -1,0 +1,6 @@
+version: '3'
+services:
+  always-failure:
+    build: ./always-failure
+  always-healthy:
+    build: ./always-healthy
