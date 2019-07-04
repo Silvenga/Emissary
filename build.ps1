@@ -13,6 +13,7 @@ docker tag silvenga/emissary:$BuildVersion silvenga/emissary:latest
 if ($shouldRelease)
 {
     Write-Host "Deploying image to DockerHub."
+    docker login --username "$env:DOCKER_USERNAME" --password "$env:DOCKER_PASSWORD"
     docker push silvenga/emissary:$BuildVersion
     docker push silvenga/emissary:latest
 }

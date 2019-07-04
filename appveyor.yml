@@ -17,9 +17,9 @@ dotnet_csproj:
   file_version: '{version}'
   informational_version: '{version}'
 environment:
-  DOCKER_AUTH:
-    secure: PTQaihoDFzLdA6kSCeVqvXIrJVXj3Q5M2aneMx8m5Kef37IKGdFbKoe5SlBuRajB47p4sZhATD/jijtiWSq/FPeJBlTZkenAYUYvIfV332Z8+ID+Hw310GmjxRO/r2E/
+  DOCKER_USERNAME:
+    secure: hn2vauofTyGlL4ghb9l1AQ==
+  DOCKER_PASSWORD:
+    secure: z0QkG5dMUovqmdiVrojAAA==
 build_script:
-- pwsh: mkdir /home/appveyor/.docker/
-- pwsh: Out-File -FilePath /home/appveyor/.docker/config.json -InputObject "$env:DOCKER_AUTH" -Encoding ASCII
 - pwsh: ./build.ps1 -BuildVersion "$env:APPVEYOR_BUILD_VERSION" -Release "$env:APPVEYOR_REPO_TAG"
