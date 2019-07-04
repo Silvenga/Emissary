@@ -7,7 +7,7 @@ $shouldRelease = $Release -eq "true"
 
 Write-Host "Building image using version: $BuildVersion."
 
-docker build -t silvenga/emissary:$BuildVersion -f src/Emissary/Dockerfile .
+docker build -t silvenga/emissary:$BuildVersion -f Dockerfile .
 docker tag silvenga/emissary:$BuildVersion silvenga/emissary:latest
 
 if ($shouldRelease)
