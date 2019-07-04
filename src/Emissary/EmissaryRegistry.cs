@@ -51,7 +51,7 @@ namespace Emissary
 
             For<IContainerRegistrar>().Use<ContainerRegistrar>();
             For<JobScheduler>().Use<JobScheduler>().Singleton();
-            For<IServiceLabelParser>().Use<ServiceLabelParser>();
+            For<IServiceLabelParser>().Use<ServiceLabelParser>().Singleton();
 
             For<IAgent>().Add<PollingContainerDiscoveryAgent>();
             For<IAgent>().Add<SubscribingContainerDiscoveryAgent>();

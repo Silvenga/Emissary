@@ -24,6 +24,30 @@ namespace Emissary.Clients
             _labelParser = labelParser;
         }
 
+        public async Task<IReadOnlyList<DiscoveredContainer>> GetRunningContainers(CancellationToken cancellationToken)
+        {
+            var containers = await _client.Containers.ListContainersAsync(new ContainersListParameters(), cancellationToken);
+            var inspectTasks = containers.Select(x => GetRunningContainerById(x.ID, cancellationToken));
+            var results = await Task.WhenAll(inspectTasks);
+            return results.ToList();
+        }
+
+        public async Task<DiscoveredContainer> GetRunningContainerById(string id, CancellationToken cancellationToken)
+        {
+            var result = await _client.Containers.InspectContainerAsync(id, cancellationToken);
+            return new DiscoveredContainer
+            {
+                Id = result.ID,
+                Created = result.Created,
+                Images = result.Image,
+                Labels = GetLabels(result).ToDictionary(x => x.Key, x => x.Value),
+                Names = result.Name,
+                Ports = GetPorts(result).ToList(),
+                State = result.State.Status,
+                Status = result.State.Status // TODO
+            };
+        }
+
         public async Task<IReadOnlyList<ContainerService>> GetRunningContainerServices(CancellationToken cancellationToken)
         {
             var containers = await _client.Containers.ListContainersAsync(new ContainersListParameters(), cancellationToken);

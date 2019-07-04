@@ -8,3 +8,7 @@ services:
     build: ./always-healthy
     labels:
       com.silvenga.emissary.service-1: always-healthy;443;tags=tag1,test2
+  bad-parse:
+    build: ./always-healthy
+    labels:
+      com.silvenga.emissary.service-1: always-healthy

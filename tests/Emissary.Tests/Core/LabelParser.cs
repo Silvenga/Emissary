@@ -116,6 +116,18 @@ namespace Emissary.Tests.Core
         }
 
         [Fact]
+        public void When_port_format_is_incorrect_fail_parse()
+        {
+            const string label = "some value;port";
+
+            // Act
+            var (success, _) = _parser.TryParseValue(label, 80);
+
+            // Assert
+            success.Should().BeFalse();
+        }
+
+        [Fact]
         public void When_given_correct_label_key_return_true()
         {
             const string key = "com.silvenga.emissary.service";
