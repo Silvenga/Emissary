@@ -2,11 +2,9 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-
 using Emissary.Clients;
 using Emissary.Core;
 using Emissary.Core.Events;
-
 using NLog;
 
 namespace Emissary.Agents
@@ -43,10 +41,19 @@ namespace Emissary.Agents
         {
             foreach (var service in e.Services)
             {
-                _client.DeregisterContainerService(e.ContainerId, service.ServiceName, CancellationToken.None).Wait();
+                try
+                {
+                    _client.DeregisterContainerService(e.ContainerId, service.ServiceName, CancellationToken.None).Wait();
+                }
+                catch (Exception exception)
+                {
+                    Logger.Warn(exception,
+                        $"Error when trying to deregistered container [{e.ContainerId.ToShortContainerName()}] service [{service.ServiceName}].");
+                }
             }
 
-            Logger.Info($"Deregistered container [{e.ContainerId.ToShortContainerName()}] services [{string.Join(", ", e.Services.Select(x => x.ServiceName))}].");
+            Logger.Info(
+                $"Deregistered container [{e.ContainerId.ToShortContainerName()}] services [{string.Join(", ", e.Services.Select(x => x.ServiceName))}].");
         }
 
         private async Task MaintenanceLoop(IContainerRegistrar registrar, CancellationToken token)
