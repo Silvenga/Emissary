@@ -63,21 +63,29 @@ namespace Emissary.Agents
                 var desiredServices = transaction.GetAllContainerServices();
                 var consulServices = await _client.GetRegisteredServicesAndChecks(token);
 
-                var checks = from desiredService in desiredServices
-                             from consulService in consulServices.Where(x => x.ContainerId == desiredService.ContainerId)
-                             let status = ""
-                                          + $"Container: {desiredService.ContainerId.ToShortContainerName()}\n"
-                                          + $"    Image: {desiredService.Image}\n"
-                                          + $" Creation: {desiredService.ContainerCreationOn}\n"
-                                          + $"    State: {desiredService.ContainerState}\n"
-                                          + $"   Status: {desiredService.ContainerStatus}"
-                             select new
-                             {
-                                 Status = status,
-                                 consulService.CheckId
-                             };
+                var checks = (from desiredService in desiredServices
+                              from consulService in consulServices.Where(x => x.ContainerId == desiredService.ContainerId).DefaultIfEmpty()
+                              let status = ""
+                                           + $"Container: {desiredService.ContainerId.ToShortContainerName()}\n"
+                                           + $"    Image: {desiredService.Image}\n"
+                                           + $" Creation: {desiredService.ContainerCreationOn}\n"
+                                           + $"    State: {desiredService.ContainerState}\n"
+                                           + $"   Status: {desiredService.ContainerStatus}"
+                              select new
+                              {
+                                  desiredService.ContainerId,
+                                  Status = status,
+                                  consulService?.CheckId,
+                                  Missing = consulService == null
+                              }).ToList();
 
-                foreach (var check in checks)
+                foreach (var check in checks.Where(x => x.Missing))
+                {
+                    Logger.Warn($"Container [{check.ContainerId.ToShortContainerName()}] disappeared from consul, assuming the container was removed.");
+                    transaction.DeleteContainer(check.ContainerId);
+                }
+
+                foreach (var check in checks.Where(x => !x.Missing))
                 {
                     await _client.MaintainService(check.CheckId, check.Status, token);
                 }

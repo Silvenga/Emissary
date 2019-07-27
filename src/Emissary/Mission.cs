@@ -44,7 +44,7 @@ namespace Emissary
             Logger.Info(@"                                         __/ | ");
             Logger.Info(@"                                        |___/  ");
             Logger.Info("");
-            Logger.Info($"The emissary mission has begun using version {Assembly.GetEntryAssembly().GetName().Version}.");
+            Logger.Info($"The emissary mission has begun using version {Assembly.GetEntryAssembly()?.GetName().Version}.");
 
             var configurationValid = _configuration.Validate(out var results);
             if (!configurationValid)
