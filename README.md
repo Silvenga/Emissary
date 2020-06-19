@@ -1,7 +1,7 @@
 
 # Emissary
 
-![Build](https://github.com/Silvenga/Emissary/workflows/Build/badge.svg)
+[![Build](https://github.com/Silvenga/Emissary/workflows/Build/badge.svg)](https://github.com/Silvenga/Emissary/actions?query=workflow%3ABuild)
 [![DockerHub](https://img.shields.io/badge/image-dockerhub-blue.svg?maxAge=3600&logo=docker)](https://hub.docker.com/r/silvenga/emissary/)
 [![License](https://img.shields.io/github/license/silvenga/MediatR.Ninject.svg?maxAge=86400)](https://github.com/Silvenga/MediatR.Ninject/blob/master/LICENSE)
 
