@@ -1,9 +1,9 @@
 
 # Emissary
 
-[![AppVeyor](https://img.shields.io/appveyor/ci/Silvenga/emissary.svg?logo=appveyor&maxAge=3600&style=flat-square)](https://ci.appveyor.com/project/Silvenga/emissary)
-[![DockerHub](https://img.shields.io/badge/image-dockerhub-blue.svg?maxAge=3600&logo=docker&style=flat-square)](https://hub.docker.com/r/silvenga/emissary/)
-[![License](https://img.shields.io/github/license/silvenga/MediatR.Ninject.svg?maxAge=86400&style=flat-square)](https://github.com/Silvenga/MediatR.Ninject/blob/master/LICENSE)
+![Build](https://github.com/Silvenga/Emissary/workflows/Build/badge.svg)
+[![DockerHub](https://img.shields.io/badge/image-dockerhub-blue.svg?maxAge=3600&logo=docker)](https://hub.docker.com/r/silvenga/emissary/)
+[![License](https://img.shields.io/github/license/silvenga/MediatR.Ninject.svg?maxAge=86400)](https://github.com/Silvenga/MediatR.Ninject/blob/master/LICENSE)
 
 Automatically registers services running in Docker containers with Consul.
 
