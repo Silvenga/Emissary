@@ -9,13 +9,16 @@ COPY Emissary.sln .
 RUN dotnet restore
 COPY . .
 
-RUN dotnet build -c Release
+ARG BUILD_VERSION=0.0.1
+RUN dotnet build -c Release -p:Version=${BUILD_VERSION}
 
 FROM build AS test
-RUN dotnet test -c Release
+ARG BUILD_VERSION=0.0.1
+RUN dotnet test -c Release -p:Version=${BUILD_VERSION}
 
 FROM build AS publish
-RUN dotnet publish src/Emissary/Emissary.csproj -c Release -o /app
+ARG BUILD_VERSION=0.0.1
+RUN dotnet publish src/Emissary/Emissary.csproj -c Release -o /app -p:Version=${BUILD_VERSION}
 
 FROM base AS final
 WORKDIR /app
