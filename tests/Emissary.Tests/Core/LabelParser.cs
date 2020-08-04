@@ -1,9 +1,6 @@
 ﻿using CommandLine;
-
 using Emissary.Core;
-
 using FluentAssertions;
-
 using Xunit;
 
 namespace Emissary.Tests.Core
@@ -16,6 +13,19 @@ namespace Emissary.Tests.Core
         public void Can_parse_service_name()
         {
             const string label = "name;80";
+
+            // Act
+            var (success, result) = _parser.TryParseValue(label);
+
+            // Assert
+            success.Should().BeTrue();
+            result.ServiceName.Should().Be("name");
+        }
+
+        [Fact]
+        public void Can_parse_service_name_with_fallback_separator()
+        {
+            const string label = "name.80";
 
             // Act
             var (success, result) = _parser.TryParseValue(label);

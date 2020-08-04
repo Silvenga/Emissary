@@ -41,7 +41,7 @@ namespace Emissary.Core
 
         private (bool Success, ServiceLabel Result) TryParseValue(CacheKey cacheKey)
         {
-            var parts = cacheKey.Value.Split(";").Select(x => x.Contains("=") ? "--" + x : x);
+            var parts = cacheKey.Value.Split(';', '.').Select(x => x.Contains("=") ? "--" + x : x);
             var success = false;
             ServiceLabel result = null;
             var parsed = _parser.ParseArguments<ServiceLabel>(parts);
