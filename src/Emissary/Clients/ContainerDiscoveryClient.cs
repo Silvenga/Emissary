@@ -99,7 +99,7 @@ namespace Emissary.Clients
 
         public async Task GetEvents(YieldingProgress<ContainerEvent> yieldingProgress, CancellationToken cancellationToken)
         {
-            var progress = new Progress<JSONMessage>(message =>
+            var progress = new Progress<Message>(message =>
             {
                 var result = new ContainerEvent
                 {
